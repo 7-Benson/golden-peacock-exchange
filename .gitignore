@@ -1,6 +1,16 @@
+# OpenClaw workspace files
 .openclaw/
 .learnings/
 HEARTBEAT.md
 TASK_QUEUE.md
 parse_xlsx.js
 memory/
+AGENTS.md
+IDENTITY.md
+MEMORY.md
+SOUL.md
+TOOLS.md
+USER.md
+__pycache__/
+*.pyc
+.DS_Store

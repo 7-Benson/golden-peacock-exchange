@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Golden Peacock Exchange 16-slide PPT"""
+"""Generate Golden Peacock Exchange PPT - Platform Token + Exchange Narrative"""
 
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
@@ -9,15 +9,15 @@ from pptx.enum.shapes import MSO_SHAPE
 import os
 
 prs = Presentation()
-prs.slide_width = Inches(13.333)  # 16:9
+prs.slide_width = Inches(13.333)
 prs.slide_height = Inches(7.5)
 
 # ── Color Palette ──
-GOLD = RGBColor(0xD4, 0xA5, 0x37)       # 金色主色
-GOLD_LIGHT = RGBColor(0xF0, 0xD0, 0x60)  # 浅金
-GOLD_DARK = RGBColor(0xB8, 0x86, 0x0B)   # 暗金
-DARK = RGBColor(0x1A, 0x1A, 0x2E)        # 深蓝黑
-DARK2 = RGBColor(0x16, 0x21, 0x38)       # 更深的背景
+GOLD = RGBColor(0xD4, 0xA5, 0x37)
+GOLD_LIGHT = RGBColor(0xF0, 0xD0, 0x60)
+GOLD_DARK = RGBColor(0xB8, 0x86, 0x0B)
+DARK = RGBColor(0x1A, 0x1A, 0x2E)
+DARK2 = RGBColor(0x16, 0x21, 0x38)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 LIGHT_GRAY = RGBColor(0xCC, 0xCC, 0xCC)
 ACCENT_GREEN = RGBColor(0x2E, 0xCC, 0x71)
@@ -26,28 +26,22 @@ ACCENT_RED = RGBColor(0xE7, 0x4C, 0x3C)
 
 
 def set_slide_bg(slide, color=DARK2):
-    """Set slide background to solid color."""
     bg = slide.background
     fill = bg.fill
     fill.solid()
     fill.fore_color.rgb = color
 
 
-def add_shape_bg(slide, left, top, width, height, color, alpha=None):
-    """Add a colored rectangle shape as background element."""
+def add_shape_bg(slide, left, top, width, height, color):
     shape = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, height)
     shape.fill.solid()
     shape.fill.fore_color.rgb = color
     shape.line.fill.background()
-    if alpha is not None:
-        # python-pptx doesn't support alpha directly; skip
-        pass
     return shape
 
 
 def add_text_box(slide, left, top, width, height, text, font_size=18, color=WHITE,
                  bold=False, alignment=PP_ALIGN.LEFT, font_name='Microsoft YaHei'):
-    """Add a text box with single paragraph."""
     txBox = slide.shapes.add_textbox(left, top, width, height)
     tf = txBox.text_frame
     tf.word_wrap = True
@@ -62,9 +56,6 @@ def add_text_box(slide, left, top, width, height, text, font_size=18, color=WHIT
 
 
 def add_rich_text_box(slide, left, top, width, height, lines, font_name='Microsoft YaHei'):
-    """Add a text box with multiple paragraphs of different styles.
-    lines: list of (text, font_size, color, bold, alignment) tuples
-    """
     txBox = slide.shapes.add_textbox(left, top, width, height)
     tf = txBox.text_frame
     tf.word_wrap = True
@@ -74,7 +65,6 @@ def add_rich_text_box(slide, left, top, width, height, lines, font_name='Microso
         color = line_data[2] if len(line_data) > 2 else WHITE
         bold = line_data[3] if len(line_data) > 3 else False
         alignment = line_data[4] if len(line_data) > 4 else PP_ALIGN.LEFT
-
         if i == 0:
             p = tf.paragraphs[0]
         else:
@@ -90,7 +80,6 @@ def add_rich_text_box(slide, left, top, width, height, lines, font_name='Microso
 
 
 def add_gold_accent_line(slide, left, top, width, height=Pt(3)):
-    """Add a thin gold line."""
     shape = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, height)
     shape.fill.solid()
     shape.fill.fore_color.rgb = GOLD
@@ -99,24 +88,19 @@ def add_gold_accent_line(slide, left, top, width, height=Pt(3)):
 
 
 def add_card(slide, left, top, width, height, title, body, title_color=GOLD, bg_color=RGBColor(0x22, 0x2E, 0x44)):
-    """Add a card with title and body text."""
     card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
     card.fill.solid()
     card.fill.fore_color.rgb = bg_color
     card.line.color.rgb = GOLD_DARK
     card.line.width = Pt(1)
-
-    # Title
     add_text_box(slide, left + Inches(0.3), top + Inches(0.2), width - Inches(0.6), Inches(0.5),
                  title, font_size=16, color=title_color, bold=True)
-    # Body
     add_text_box(slide, left + Inches(0.3), top + Inches(0.7), width - Inches(0.6), height - Inches(0.9),
                  body, font_size=13, color=LIGHT_GRAY)
     return card
 
 
 def add_bullet_list(slide, left, top, width, height, items, font_size=16, color=LIGHT_GRAY, bullet_char="▸"):
-    """Add a bulleted list."""
     tb = slide.shapes.add_textbox(left, top, width, height)
     tf = tb.text_frame
     tf.word_wrap = True
@@ -133,81 +117,90 @@ def add_bullet_list(slide, left, top, width, height, items, font_size=16, color=
     return tb
 
 
-def add_section_number(slide, num, total=16):
-    """Add page number at bottom right."""
+def add_section_number(slide, num, total=15):
     add_text_box(slide, Inches(12.0), Inches(7.0), Inches(1.2), Inches(0.4),
                  f"{num}/{total}", font_size=11, color=GOLD_DARK, alignment=PP_ALIGN.RIGHT)
 
 
 def add_header_bar(slide, title, subtitle=None, page_num=None):
-    """Add a standard header with gold accent line."""
-    # Top gold line
     add_shape_bg(slide, Inches(0), Inches(0), Inches(13.333), Pt(4), GOLD)
-    # Title
     add_text_box(slide, Inches(0.8), Inches(0.4), Inches(10), Inches(0.7),
                  title, font_size=32, color=GOLD, bold=True)
     if subtitle:
         add_text_box(slide, Inches(0.8), Inches(1.0), Inches(10), Inches(0.5),
                      subtitle, font_size=16, color=LIGHT_GRAY)
-    # Bottom accent
     add_gold_accent_line(slide, Inches(0.8), Inches(1.4), Inches(3), Pt(2))
     if page_num:
         add_section_number(slide, page_num)
 
 
+def add_table(slide, left, top, width, height, rows, cols, data, col_widths=None):
+    """Add a table. data = list of lists."""
+    table_shape = slide.shapes.add_table(rows, cols, left, top, width, height)
+    table = table_shape.table
+    if col_widths:
+        for i, w in enumerate(col_widths):
+            table.columns[i].width = w
+    for r in range(rows):
+        for c in range(cols):
+            cell = table.cell(r, c)
+            cell.text = data[r][c] if r < len(data) and c < len(data[r]) else ""
+            for paragraph in cell.text_frame.paragraphs:
+                paragraph.font.size = Pt(12)
+                paragraph.font.name = 'Microsoft YaHei'
+                paragraph.font.color.rgb = WHITE if r == 0 else LIGHT_GRAY
+                if r == 0:
+                    paragraph.font.bold = True
+                # Header row background
+                if r == 0:
+                    cell.fill.solid()
+                    cell.fill.fore_color.rgb = GOLD_DARK
+                else:
+                    cell.fill.solid()
+                    cell.fill.fore_color.rgb = RGBColor(0x1A, 0x2A, 0x3E) if r % 2 == 1 else RGBColor(0x22, 0x2E, 0x44)
+    return table_shape
+
+
+TOTAL_SLIDES = 15
+
 # ═══════════════════════════════════════════════
 # SLIDE 1: COVER
 # ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank
+slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK)
 
-# Decorative gold rectangle top
 add_shape_bg(slide, Inches(0), Inches(0), Inches(13.333), Inches(2.8), RGBColor(0x12, 0x1A, 0x30))
-
-# Big gold accent bar
 add_shape_bg(slide, Inches(0), Inches(2.8), Inches(13.333), Pt(5), GOLD)
 
-# Gold decorative circle (abstract peacock)
+# Peacock emblem
 circ = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(5.5), Inches(1.0), Inches(2.3), Inches(2.3))
 circ.fill.solid()
 circ.fill.fore_color.rgb = GOLD
 circ.line.fill.background()
-# Inner circle
 circ2 = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(5.9), Inches(1.4), Inches(1.5), Inches(1.5))
 circ2.fill.solid()
 circ2.fill.fore_color.rgb = GOLD_DARK
 circ2.line.fill.background()
-# Peacock "eye" dot
 circ3 = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(6.4), Inches(1.9), Inches(0.5), Inches(0.5))
 circ3.fill.solid()
 circ3.fill.fore_color.rgb = WHITE
 circ3.line.fill.background()
 
-# Title
 add_text_box(slide, Inches(1), Inches(3.5), Inches(11.3), Inches(1.2),
-             "金孔雀交易所", font_size=54, color=GOLD, bold=True,
-             alignment=PP_ALIGN.CENTER)
+             "金孔雀交易所", font_size=54, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1), Inches(4.5), Inches(11.3), Inches(0.8),
-             "GOLDEN PEACOCK EXCHANGE", font_size=28, color=WHITE, bold=False,
-             alignment=PP_ALIGN.CENTER)
+             "GOLDEN PEACOCK EXCHANGE", font_size=28, color=WHITE, alignment=PP_ALIGN.CENTER)
 
-# Gold separator
 add_shape_bg(slide, Inches(5), Inches(5.3), Inches(3.333), Pt(3), GOLD)
 
-# Subtitle
 add_text_box(slide, Inches(1), Inches(5.6), Inches(11.3), Inches(0.6),
-             "东南亚RWA资产发行平台  —  泰国房地产RWA首发", font_size=20, color=LIGHT_GRAY,
-             alignment=PP_ALIGN.CENTER)
-
-# Tagline
+             "数字资产交易平台  —  GPC平台通证首发", font_size=20, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1), Inches(6.3), Inches(11.3), Inches(0.5),
-             "链接实体资产 · 开启RWA新纪元", font_size=16, color=GOLD_LIGHT,
-             alignment=PP_ALIGN.CENTER)
+             "链接数字资产 · 开启价值新纪元", font_size=16, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
 
-# Bottom gold bar
 add_shape_bg(slide, Inches(0), Inches(7.1), Inches(13.333), Pt(4), GOLD)
+add_section_number(slide, 1, TOTAL_SLIDES)
 
-add_section_number(slide, 1)
 
 # ═══════════════════════════════════════════════
 # SLIDE 2: PROJECT OVERVIEW
@@ -216,380 +209,385 @@ slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
 add_header_bar(slide, "项目概览", "Project Overview", 2)
 
-# Positioning statement
+# Positioning
 add_shape_bg(slide, Inches(0.8), Inches(1.7), Inches(11.7), Inches(0.8), RGBColor(0x22, 0x2E, 0x44))
 add_text_box(slide, Inches(1.0), Inches(1.8), Inches(11.3), Inches(0.6),
-             "东南亚首个专注房地产RWA的合规资产发行与交易平台", font_size=20, color=GOLD_LIGHT, bold=True)
+             "新一代数字资产交易平台 — 基于币安链（BNB Chain）构建，原生平台通证GPC驱动生态",
+             font_size=18, color=GOLD_LIGHT, bold=True)
 
-# Three key points
-card_data = [
-    ("🎯 首个标的", "泰国芭提雅核心区\n房地产RWA项目", Inches(0.8)),
-    ("💰 发行规模", "具体金额待定\n（根据资产估值确定）", Inches(4.8)),
-    ("🏢 资产方", "环球国际资产管理公司\n优质底层资产提供方", Inches(8.8)),
+# Three key cards
+cards_data = [
+    ("🏛️", "平台定位", "数字资产交易平台\n支持现货交易、质押挖矿\nLaunchpad等核心功能"),
+    ("💎", "平台通证 GPC", "总发行量 10,000,000,000\nBEP-20标准\n驱动平台生态价值"),
+    ("🔮", "未来展望", "东南亚领先的数字资产交易生态\nRWA不动产代币化（规划中）"),
 ]
-for title, body, left in card_data:
-    add_card(slide, left, Inches(2.8), Inches(3.6), Inches(1.8), title, body)
+for i, (icon, title, body) in enumerate(cards_data):
+    left = Inches(0.8 + i * 4.1)
+    add_card(slide, left, Inches(2.8), Inches(3.7), Inches(2.0), f"{icon} {title}", body)
 
 # Vision
-add_text_box(slide, Inches(0.8), Inches(5.0), Inches(11.7), Inches(0.4),
+add_text_box(slide, Inches(0.8), Inches(5.2), Inches(11.7), Inches(0.4),
              "项目愿景", font_size=20, color=GOLD, bold=True)
-add_text_box(slide, Inches(0.8), Inches(5.5), Inches(11.7), Inches(0.8),
-             "让全球投资者低门槛参与东南亚优质不动产投资，实现资产跨境自由流动",
+add_text_box(slide, Inches(0.8), Inches(5.7), Inches(11.7), Inches(0.6),
+             "构建安全、高效、透明的数字资产交易生态，让全球用户自由参与数字资产价值流通",
              font_size=17, color=LIGHT_GRAY)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 3: RWA MARKET BACKGROUND
+# SLIDE 3: MARKET OPPORTUNITY
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "行业背景 — RWA市场爆发", "Real World Assets: The Next Crypto Frontier", 3)
+add_header_bar(slide, "市场机遇", "Market Opportunity", 3)
 
-# RWA Definition
-add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(2.0),
-         "什么是RWA？",
-         "Real World Assets（真实世界资产）\n将房地产、债券、大宗商品等实体\n资产进行代币化并上链流通")
-
-# Data card
-add_card(slide, Inches(6.8), Inches(1.8), Inches(5.5), Inches(2.0),
-         "市场数据",
-         "• RWA市场2025年突破多亿美元规模\n• 全球代币化资产预计2030年\n  达数万亿至十万亿美元级别\n• 头部机构纷纷布局")
-
-# Why RWA
-add_card(slide, Inches(0.8), Inches(4.2), Inches(5.5), Inches(2.5),
-         "为什么是RWA？",
-         "✅ 传统资产流动性差 → 代币化提升流动性\n✅ 投资门槛高 → 碎片化降低门槛\n✅ 跨境交易难 → 链上全球自由流通\n✅ 透明度低 → 智能合约自动执行")
-
-# Drivers
-add_card(slide, Inches(6.8), Inches(4.2), Inches(5.5), Inches(2.5),
-         "核心驱动力",
-         "🚀 区块链技术成熟\n📋 各国监管政策清晰化\n🌍 全球通胀下的资产配置需求\n🏦 机构资金大举入场")
-
-
-# ═══════════════════════════════════════════════
-# SLIDE 4: MARKET OPPORTUNITY - SEA
-# ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])
-set_slide_bg(slide, DARK2)
-add_header_bar(slide, "市场机遇 — 东南亚RWA蓝海", "Southeast Asia: The Untapped RWA Market", 4)
-
-# SEA advantages
-add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(2.3),
-         "东南亚独特优势",
-         "📈 高经济增长 + 持续外资流入\n✈️ 旅游业强劲复苏\n🏠 泰国房地产对外国人购买有限制\n   → 代币化提供合规投资通道")
-
-# Pattaya basics
-add_card(slide, Inches(6.8), Inches(1.8), Inches(5.5), Inches(2.3),
-         "芭提雅房产基本面",
-         "🌊 年游客超千万人次\n💰 租金回报率 4%-8%\n🏖️ 一线海景公寓需求旺盛\n🛣️ 基建持续升级中")
-
-# Market gap
-add_shape_bg(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(1.2), RGBColor(0x22, 0x2E, 0x44))
-add_text_box(slide, Inches(1.0), Inches(4.6), Inches(11.3), Inches(0.4),
-             "空白市场机会", font_size=20, color=GOLD, bold=True)
-add_text_box(slide, Inches(1.0), Inches(5.0), Inches(11.3), Inches(0.5),
-             "东南亚专业RWA交易所稀缺 → 金孔雀交易所抢占先机，成为区域首家专注房地产RWA的合规平台",
-             font_size=17, color=LIGHT_GRAY)
-
-# Opportunity size callout
-add_shape_bg(slide, Inches(4.0), Inches(6.0), Inches(5.3), Inches(0.7), GOLD_DARK)
-add_text_box(slide, Inches(4.0), Inches(6.05), Inches(5.3), Inches(0.6),
-             "先发优势 — 蓝海市场第一梯队",
-             font_size=18, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
-
-
-# ═══════════════════════════════════════════════
-# SLIDE 5: PLATFORM POSITIONING
-# ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])
-set_slide_bg(slide, DARK2)
-add_header_bar(slide, "平台定位与核心价值", "Platform Positioning & Value Proposition", 5)
-
-# Positioning
-add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.3),
-         "金孔雀交易所定位",
-         "RWA资产的「发行 + 交易 + 管理」一体化平台 — 专注东南亚房地产RWA赛道")
-
-# Value props
-props = [
-    ("🔑", "合规", "持牌运营\n严格KYC/AML体系", Inches(0.8)),
-    ("🔑", "真实", "资产严格尽调\n链上锚定线下产权", Inches(3.8)),
-    ("🔑", "低门槛", "最小投资单位大幅降低\n碎片化普惠投资", Inches(6.8)),
-    ("🔑", "高流动性", "二级市场交易\nT+0灵活退出机制", Inches(9.8)),
+cards3 = [
+    ("📊", "全球加密市场爆发",
+     "• 全球加密用户超5亿\n• 数字资产交易量持续增长\n• 合规化趋势加速\n• 机构资金大举入场"),
+    ("🌏", "东南亚数字浪潮",
+     "• 东南亚加密采用率全球领先\n• 年轻人口+高移动渗透率\n• 传统金融覆盖不足\n→ 数字金融弯道超车"),
+    ("🏆", "交易所竞争格局",
+     "• 区域化交易所崛起\n• BNB Chain生态快速增长\n• 合规+本地化 = 核心壁垒\n• GPC平台币驱动生态飞轮"),
 ]
-for icon, title, desc, left in props:
-    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(3.5), Inches(2.7), Inches(2.5))
+for i, (icon, title, body) in enumerate(cards3):
+    left = Inches(0.8 + i * 4.1)
+    add_card(slide, left, Inches(1.8), Inches(3.7), Inches(2.8), f"{icon} {title}", body)
+
+# Future note
+add_shape_bg(slide, Inches(0.8), Inches(5.0), Inches(11.7), Inches(1.0), RGBColor(0x22, 0x2E, 0x44))
+add_text_box(slide, Inches(1.0), Inches(5.05), Inches(11.3), Inches(0.3),
+             "🌟 战略前瞻", font_size=16, color=GOLD, bold=True)
+add_text_box(slide, Inches(1.0), Inches(5.4), Inches(11.3), Inches(0.5),
+             "RWA（真实世界资产代币化）市场预计2030年达数万亿级别 — 金孔雀交易所将以此作为第二阶段核心战略",
+             font_size=14, color=LIGHT_GRAY)
+
+
+# ═══════════════════════════════════════════════
+# SLIDE 4: PLATFORM VALUE PROPOSITION
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+set_slide_bg(slide, DARK2)
+add_header_bar(slide, "平台核心价值", "Platform Core Value Proposition", 4)
+
+props = [
+    ("🛡️", "安全可靠", "多层安全防护体系\n冷热钱包分离\n第三方安全审计"),
+    ("⚡", "高效流畅", "基于BNB Chain\n高吞吐低延迟\n毫秒级交易确认"),
+    ("🔍", "透明可信", "链上资产可查\n定期审计报告\n合规KYC/AML"),
+    ("🌐", "全球普惠", "低门槛参与\n多语言支持\n多元化金融服务"),
+]
+for i, (icon, title, desc) in enumerate(props):
+    left = Inches(0.8 + i * 3.1)
+    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(1.8), Inches(2.8), Inches(2.5))
     card.fill.solid()
     card.fill.fore_color.rgb = RGBColor(0x22, 0x2E, 0x44)
     card.line.color.rgb = GOLD_DARK
     card.line.width = Pt(1)
-    add_text_box(slide, left + Inches(0.3), Inches(3.7), Inches(2.1), Inches(0.5),
+    add_text_box(slide, left + Inches(0.2), Inches(1.9), Inches(2.4), Inches(0.5),
                  f"{icon} {title}", font_size=20, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
-    add_text_box(slide, left + Inches(0.2), Inches(4.3), Inches(2.3), Inches(1.5),
-                 desc, font_size=14, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left + Inches(0.2), Inches(2.5), Inches(2.4), Inches(1.5),
+                 desc, font_size=15, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
+
+# Value chain
+add_card(slide, Inches(0.8), Inches(4.7), Inches(11.7), Inches(1.5),
+         "平台生态飞轮",
+         "GPC平台币价值 → 赋能交易/质押/治理 → 吸引用户与流动性 → 生态繁荣驱动GPC需求 → GPC价值提升 → 反哺平台发展")
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 6: FIRST ASSET
+# SLIDE 5: PLATFORM CORE FEATURES
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "首个标的 — 芭提雅房地产RWA", "First RWA Asset: Pattaya Real Estate", 6)
+add_header_bar(slide, "平台核心功能", "Core Platform Features", 5)
 
-# Asset details
-add_card(slide, Inches(0.8), Inches(1.8), Inches(5.8), Inches(1.8),
-         "标的资产信息",
-         "📍 位置：芭提雅核心区（中天海滩 / 帕山区 / 纳哥路）\n🏠 类型：高端海景公寓 / 度假酒店综合项目\n📐 规模：待具体确认（建筑面积 / 单位数量 / 估值）")
-
-add_card(slide, Inches(7.0), Inches(1.8), Inches(5.5), Inches(1.8),
-         "芭提雅区位优势",
-         "🚄 曼谷EEC高铁1小时直达\n✈️ 乌塔堡机场扩建中\n🏗️ 大型基建项目密集落地\n🛍️ 商业配套持续升级")
-
-# Asset highlights
-add_text_box(slide, Inches(0.8), Inches(4.0), Inches(11.7), Inches(0.4),
-             "资产亮点", font_size=20, color=GOLD, bold=True)
-
-highlights = [
-    ("💰", "稳定租金现金流", "旅游复苏带动入住率\n预期年化租金回报 5-8%"),
-    ("📈", "长期增值潜力", "芭提雅升级为城市\n土地价值持续攀升"),
-    ("⚖️", "产权清晰", "法律结构完善\nSPV持有产权"),
-    ("🛡️", "专业管理", "环球国际资产管理\n全流程资产服务"),
+feats = [
+    ("💱", "现货交易", "主流交易对支持\n订单簿深度好\n专业级交易界面"),
+    ("⛏️", "GPC质押挖矿", "质押GPC获取收益\n灵活质押期限\n年化收益可观"),
+    ("🚀", "Launchpad", "优质项目首发平台\nGPC持有者优先认购\n代币销售与拍卖"),
+    ("🔗", "RWA资产发行", "第二阶段开放\n实体资产代币化\n合规发行交易平台"),
 ]
-for i, (icon, title, desc, ) in enumerate(highlights):
+for i, (icon, title, desc) in enumerate(feats):
     left = Inches(0.8 + i * 3.1)
-    add_card(slide, left, Inches(4.5), Inches(2.8), Inches(2.2), f"{icon} {title}", desc)
+    add_card(slide, left, Inches(1.8), Inches(2.8), Inches(2.3), f"{icon} {title}", desc)
 
-
-# ═══════════════════════════════════════════════
-# SLIDE 7: ASSET PARTNER
-# ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])
-set_slide_bg(slide, DARK2)
-add_header_bar(slide, "资产方 — 环球国际资产管理公司", "Asset Partner: Global International Asset Management", 7)
-
-# Company intro
-add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(1.8),
-         "公司简介",
-         "环球国际资产管理公司\n深耕泰国不动产领域多年\n拥有丰富的本地资源和项目经验")
-
-# Core capabilities
-add_card(slide, Inches(6.8), Inches(1.8), Inches(5.5), Inches(1.8),
-         "核心能力",
-         "🌐 本地资源：泰国房地产收购与开发经验丰富\n✅ 合规能力：熟悉BOI、土地法、外商投资法规\n🏗️ 项目储备：芭提雅多个优质项目资源")
-
-# Cooperation model
-add_card(slide, Inches(0.8), Inches(4.0), Inches(5.5), Inches(1.5),
-         "合作模式",
-         "作为RWA的底层资产提供方与资产服务方\n负责标的筛选、收购及后续管理")
-
-# Endorsements
-add_card(slide, Inches(6.8), Inches(4.0), Inches(5.5), Inches(1.5),
-         "资质背书",
-         "• 泰国本地相关运营牌照\n• 业内知名合作伙伴\n• 成熟的项目管理团队")
-
-
-# ═══════════════════════════════════════════════
-# SLIDE 8: RWA PRODUCT STRUCTURE
-# ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])
-set_slide_bg(slide, DARK2)
-add_header_bar(slide, "RWA产品结构", "RWA Product Structure", 8)
-
-# Flow steps
-steps = [
-    ("1", "资产收购", "筛选并收购\n优质标的资产"),
-    ("2", "法律确权", "确权+法律意见书\n产权清晰"),
-    ("3", "资产估值", "第三方独立\n专业估值"),
-    ("4", "SPV架构", "SPV持有资产\n隔离风险"),
-    ("5", "代币发行", "RWA代币化\n合规发行"),
-    ("6", "上架交易", "二级市场\nT+0交易"),
+# Additional features
+add_text_box(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(0.4),
+             "更多功能", font_size=18, color=GOLD, bold=True)
+more_feats = [
+    "钱包服务 — 安全资产管理，多链支持",
+    "行情数据 — 实时K线、深度图、市场分析",
+    "API接口 — 面向量化交易与机构客户",
 ]
-for i, (num, title, desc) in enumerate(steps):
-    left = Inches(0.5 + i * 2.1)
-    # Step circle
-    circ = slide.shapes.add_shape(MSO_SHAPE.OVAL, left + Inches(0.5), Inches(1.8), Inches(0.7), Inches(0.7))
-    circ.fill.solid()
-    circ.fill.fore_color.rgb = GOLD if int(num) <= 2 else GOLD_DARK
-    circ.line.fill.background()
-    add_text_box(slide, left + Inches(0.5), Inches(1.85), Inches(0.7), Inches(0.6),
-                 num, font_size=22, color=DARK, bold=True, alignment=PP_ALIGN.CENTER)
-    # Arrow (except last)
-    if i < len(steps) - 1:
-        add_text_box(slide, left + Inches(1.3), Inches(1.9), Inches(0.5), Inches(0.5),
-                     "→", font_size=24, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
-    # Title
-    add_text_box(slide, left, Inches(2.7), Inches(1.9), Inches(0.4), title,
-                 font_size=14, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
-    # Desc
-    add_text_box(slide, left, Inches(3.1), Inches(1.9), Inches(0.7), desc,
-                 font_size=11, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
-
-# Token design
-add_shape_bg(slide, Inches(0.8), Inches(4.0), Inches(11.7), Inches(0.6), RGBColor(0x22, 0x2E, 0x44))
-add_text_box(slide, Inches(1.0), Inches(4.05), Inches(11.3), Inches(0.5),
-             "代币设计", font_size=20, color=GOLD, bold=True)
-
-token_features = [
-    "每枚代币对应实物资产的一定份额（如1㎡房产权益）",
-    "收益分为：租金分红 + 资产增值分红",
-    "基于币安链智能合约自动分配收益，透明可查",
-    "法律结构：SPV持有资产，代币代表SPV权益份额",
-    "BEP-20代币标准，兼容主流DEX/钱包生态",
-]
-add_bullet_list(slide, Inches(1.0), Inches(4.7), Inches(11.3), Inches(2.0), token_features, font_size=15)
+add_bullet_list(slide, Inches(0.8), Inches(5.0), Inches(11.7), Inches(1.5), more_feats, font_size=14)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 9: TECH ARCHITECTURE
+# SLIDE 6: TECHNOLOGY ARCHITECTURE
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "技术架构", "Technology Architecture", 9)
+add_header_bar(slide, "技术架构", "Technology Architecture", 6)
 
 # Blockchain
 add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.5),
          "底层公链 — 币安链（BNB Chain）",
-         "采用BNB Chain（币安智能链）作为底层基础设施\n"
-         "• BEP-20代币标准，高吞吐量（~300 TPS），低交易费（<0.1$）\n"
-         "• 成熟的DeFi生态与DEX基础设施，支持PancakeSwap等主流协议集成\n"
-         "• 全球节点数最多（40+验证节点），社群活跃，开发者生态完善")
+         "BEP-20代币标准 | 高吞吐量（~300 TPS）| 低交易费用（<0.1 USD）\n"
+         "成熟的DeFi生态（PancakeSwap等DEX协议） | 全球40+验证节点 | 开发者生态系统完善")
 
 # Core modules
 modules = [
-    ("📦", "资产发行模块", "RWA代币化发行工具\nBEP-20合规代币铸造"),
-    ("🔄", "交易模块", "订单簿 + DEX混合撮合\n支持PancakeSwap流动性"),
-    ("🔐", "资产管理模块", "KYC / 合规审查\n链上资产存证"),
-    ("💸", "收益分发模块", "智能合约自动分红\n链上实时可查"),
+    ("💱", "交易引擎", "高性能撮合引擎\n订单簿深度管理\n实时行情推送"),
+    ("⛓️", "智能合约", "质押挖矿合约\nLaunchpad合约\n未来：RWA发行标准"),
+    ("🛡️", "安全系统", "KYC/AML认证系统\n风控引擎\n冷热钱包分离"),
+    ("💳", "钱包服务", "多链钱包支持\nGPC资产管理\n充值提现系统"),
 ]
 for i, (icon, title, desc) in enumerate(modules):
     left = Inches(0.8 + i * 3.1)
     add_card(slide, left, Inches(3.6), Inches(2.8), Inches(2.0), f"{icon} {title}", desc)
 
 # Security
-add_card(slide, Inches(0.8), Inches(5.8), Inches(11.7), Inches(0.8),
-         "安全审计",
-         "第三方智能合约代码审计  |  币安链生态安全标准  |  多重签名钱包  |  定期安全巡检")
+add_card(slide, Inches(0.8), Inches(5.9), Inches(11.7), Inches(0.7),
+         "安全审计", "第三方智能合约代码审计  |  币安链生态安全标准  |  多重签名钱包  |  24/7安全监控")
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 10: COMPLIANCE
-# ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])
-set_slide_bg(slide, DARK2)
-add_header_bar(slide, "合规与监管框架", "Regulatory & Compliance Framework", 10)
-
-# Compliance strategy
-add_card(slide, Inches(0.8), Inches(1.8), Inches(5.8), Inches(2.2),
-         "监管合规策略",
-         "🛡️ 持有或申请目标地区合规牌照\n🔍 严格KYC/AML体系（三级身份认证）\n📊 每季度资产审计与透明度报告\n👮 反洗钱内控制度完善")
-
-# Legal
-add_card(slide, Inches(6.8), Inches(1.8), Inches(5.8), Inches(2.2),
-         "法律保障",
-         "⚖️ 泰国本地律所出具法律意见书\n📋 SPV架构满足外商投资法规\n👥 投资者权益保护机制完善\n🌏 符合国际合规标准")
-
-# Certification badges
-badges = ["KYC/AML合规", "季度审计", "法律意见书", "投资者保护"]
-for i, badge in enumerate(badges):
-    left = Inches(0.8 + i * 3.1)
-    box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(4.5), Inches(2.8), Inches(0.8))
-    box.fill.solid()
-    box.fill.fore_color.rgb = RGBColor(0x1A, 0x2A, 0x3E)
-    box.line.color.rgb = GOLD
-    box.line.width = Pt(1)
-    add_text_box(slide, left, Inches(4.6), Inches(2.8), Inches(0.6),
-                 f"✅ {badge}", font_size=16, color=ACCENT_GREEN, bold=True, alignment=PP_ALIGN.CENTER)
-
-
-# ═══════════════════════════════════════════════
-# SLIDE 11: TOKENOMICS
+# SLIDE 7: GPC TOKENOMICS
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "代币经济模型", "Tokenomics", 11)
+add_header_bar(slide, "GPC代币经济模型", "GPC Tokenomics", 7)
 
-# Token basic info
-add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(0.8),
-         "代币符号：待定（如 GPC / GPE）",
-         "平台通证，承载交易、治理与生态价值")
+# Token info
+add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(1.0),
+         "代币信息",
+         "代币符号：GPC  |  总发行量：10,000,000,000  |  标准：BEP-20  |  公链：BNB Chain")
 
-# Allocation
-allocations = [
-    ("房地产RWA发行池", "60%", Inches(0.8)),
-    ("流动性储备", "15%", Inches(4.5)),
-    ("团队/运营", "10%", Inches(8.2)),
+# Allocation table
+table_data = [
+    ["用途", "比例", "数量", "锁仓规则"],
+    ["🌱 生态与社区激励", "60%", "60亿", "按智能合约逐步释放"],
+    ["🏦 生态基金/战略储备", "15%", "15亿", "基金会多签管理"],
+    ["💧 流动性储备", "10%", "10亿", "上线即部分流通"],
+    ["👥 团队与创始人", "2%", "2亿", "锁12个月，分24月线性释放"],
+    ["🌟 创世节点", "1%", "1亿", "锁6个月，分12月线性释放"],
+    ["📢 市场推广", "5%", "5亿", "按活动计划释放"],
+    ["🏛️ 基金会储备", "7%", "7亿", "多签钱包管理"],
 ]
-for name, pct, left in allocations:
-    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(2.9), Inches(3.3), Inches(1.3))
+
+add_table(slide, Inches(0.8), Inches(3.1), Inches(7.5), Inches(3.2),
+          len(table_data), 4, table_data,
+          col_widths=[Inches(2.3), Inches(1.2), Inches(1.2), Inches(2.8)])
+
+# Summary callout
+add_shape_bg(slide, Inches(9.0), Inches(1.8), Inches(3.8), Inches(4.5), RGBColor(0x1A, 0x2A, 0x3E))
+add_text_box(slide, Inches(9.2), Inches(1.9), Inches(3.4), Inches(0.4),
+             "📊 关键数据", font_size=18, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
+key_data = [
+    "总发行量",
+    "10,000,000,000",
+    "GPC",
+    "",
+    "公链",
+    "BNB Chain (BEP-20)",
+    "",
+    "生态占比",
+    "75%",
+    "(生态60%+储备15%)",
+]
+for i, line in enumerate(key_data):
+    if not line:
+        continue
+    fs = 20 if i in [1, 8] else 14
+    clr = GOLD if i in [1, 8] else (GOLD_LIGHT if i in [0, 4, 7] else LIGHT_GRAY)
+    bld = True if i in [0, 1, 4, 7, 8] else False
+    add_text_box(slide, Inches(9.2), Inches(2.5 + i * 0.35), Inches(3.4), Inches(0.35),
+                 line, font_size=fs, color=clr, bold=bld, alignment=PP_ALIGN.CENTER)
+
+
+# ═══════════════════════════════════════════════
+# SLIDE 8: GPC TOKEN UTILITY
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+set_slide_bg(slide, DARK2)
+add_header_bar(slide, "GPC代币价值与用途", "GPC Token Utility & Value Capture", 8)
+
+utilities = [
+    ("💱", "手续费折扣", "持有GPC可享受\n平台交易手续费减免\n持有越多折扣越大"),
+    ("⛏️", "质押挖矿", "质押GPC获取\n平台收益分红\n灵活选择锁仓期限"),
+    ("🗳️", "平台治理", "GPC持有者参与\n平台重大决策投票\n社区自治管理"),
+    ("🚀", "Launchpad认购", "优质项目的优先\n认购权与额度分配\nGPC持有者专属"),
+    ("🏪", "生态支付", "GPC作为平台内\n流通与支付介质\n交易对基础货币"),
+    ("📈", "价值增值", "平台生态增长驱动\nGPC需求持续上升\n通缩机制持续赋能"),
+]
+for i, (icon, title, desc) in enumerate(utilities):
+    row = i // 3
+    col = i % 3
+    left = Inches(0.8 + col * 4.1)
+    top = Inches(1.8 + row * 2.5)
+    add_card(slide, left, top, Inches(3.7), Inches(2.0), f"{icon} {title}", desc)
+
+
+# ═══════════════════════════════════════════════
+# SLIDE 9: TOKEN DISTRIBUTION SCHEDULE
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+set_slide_bg(slide, DARK2)
+add_header_bar(slide, "代币释放计划", "Token Release Schedule", 9)
+
+# Schedule cards
+schedules = [
+    ("👥 团队与创始人", "2%", "锁仓12个月", "第13-36个月线性释放\n每月释放约0.083%"),
+    ("🌟 创世节点", "1%", "锁仓6个月", "第7-18个月线性释放\n每月释放约0.083%"),
+    ("🌱 生态与社区激励", "60%", "按智能合约逐步释放", "交易挖矿/质押奖励/\n社区空投分期释放"),
+    ("其他", "37%", "分批释放", "流动性/基金/市场/\n储备按计划管理"),
+]
+for i, (title, pct, lock, release) in enumerate(schedules):
+    left = Inches(0.8 + i * 3.1)
+    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(1.8), Inches(2.8), Inches(2.5))
     card.fill.solid()
     card.fill.fore_color.rgb = RGBColor(0x1A, 0x2A, 0x3E)
     card.line.color.rgb = GOLD
     card.line.width = Pt(1)
-    add_text_box(slide, left, Inches(3.0), Inches(3.3), Inches(0.4),
-                 pct, font_size=28, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
-    add_text_box(slide, left, Inches(3.5), Inches(3.3), Inches(0.4),
-                 name, font_size=14, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left + Inches(0.1), Inches(1.9), Inches(2.6), Inches(0.4),
+                 title, font_size=15, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left + Inches(0.1), Inches(2.3), Inches(2.6), Inches(0.4),
+                 pct, font_size=22, color=GOLD_LIGHT, bold=True, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left + Inches(0.1), Inches(2.7), Inches(2.6), Inches(0.3),
+                 f"🔒 {lock}", font_size=12, color=ACCENT_BLUE, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left + Inches(0.1), Inches(3.1), Inches(2.6), Inches(0.8),
+                 release, font_size=12, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Remaining allocations
-add_text_box(slide, Inches(0.8), Inches(4.5), Inches(5.5), Inches(0.3),
-             "其他分配", font_size=16, color=GOLD, bold=True)
-other_items = [
-    "市场推广：10%",
-    "社区激励：5%",
+# Timeline visual
+add_shape_bg(slide, Inches(0.8), Inches(4.8), Inches(11.7), Inches(1.8), RGBColor(0x22, 0x2E, 0x44))
+add_text_box(slide, Inches(0.8), Inches(4.9), Inches(11.7), Inches(0.3),
+             "释放时间线（示意）", font_size=16, color=GOLD, bold=True)
+
+timeline_items = [
+    ("T+0", "流动性储备\n市场推广部分", "上线即部分流通"),
+    ("T+6月", "创世节点解锁\n开始线性释放", "7-18月逐步解锁"),
+    ("T+12月", "团队解锁\n开始线性释放", "13-36月逐步解锁"),
+    ("T+持续", "生态激励\n逐步释放", "按智能合约规则"),
 ]
-add_bullet_list(slide, Inches(0.8), Inches(4.9), Inches(5.5), Inches(1.0), other_items, font_size=14)
-
-
-# Value capture
-add_text_box(slide, Inches(6.5), Inches(4.5), Inches(6.0), Inches(0.3),
-             "代币价值捕获", font_size=16, color=GOLD, bold=True)
-value_items = [
-    "交易手续费折扣",
-    "平台治理投票权",
-    "新RWA项目优先认购权",
-]
-add_bullet_list(slide, Inches(6.5), Inches(4.9), Inches(6.0), Inches(1.2), value_items, font_size=14)
+for i, (time, who, detail) in enumerate(timeline_items):
+    left = Inches(0.8 + i * 3.1)
+    add_text_box(slide, left, Inches(5.3), Inches(2.8), Inches(0.3),
+                 f"📌 {time}", font_size=14, color=ACCENT_GREEN, bold=True, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left, Inches(5.6), Inches(2.8), Inches(0.3),
+                 who, font_size=12, color=WHITE, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left, Inches(5.9), Inches(2.8), Inches(0.4),
+                 detail, font_size=11, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 12: INVESTOR RETURNS
+# SLIDE 10: FUTURE VISION - RWA
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "投资者收益模型", "Investor Returns Model", 12)
+add_header_bar(slide, "未来战略 — RWA资产生态", "Future Vision: RWA Asset Ecosystem", 10)
 
-# BNB Chain advantage note
-add_shape_bg(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(0.6), RGBColor(0x1A, 0x2A, 0x3E))
-add_text_box(slide, Inches(1.0), Inches(1.85), Inches(11.3), Inches(0.5),
-             "基于币安链（BNB Chain）的RWA生态，实现链上收益自动分发与二级市场无缝交易",
-             font_size=14, color=LIGHT_GRAY)
+# Vision
+add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
+         "战略定位",
+         "金孔雀交易所以数字资产交易平台为起点，长远目标是成为东南亚领先的RWA（真实世界资产）发行与交易平台")
 
-# Return sources
-sources = [
-    ("🏠", "租金分红", "季度发放\n预期年化 5-8%", Inches(0.8)),
-    ("📈", "资产增值", "标的升值带来的\n代币价格增长", Inches(4.8)),
-    ("💹", "二级交易", "流动性溢价\n折价套利机会", Inches(8.8)),
+# RWA vision content
+rwa_cards = [
+    ("🏠", "房地产RWA", "泰国芭提雅\高端房地产项目\n（规划中）"),
+    ("📦", "多资产扩展", "商业地产/基建\n消费金融/供应链\n等多类型RWA"),
+    ("🌏", "区域拓展", "曼谷/普吉岛\n越南/印尼/菲律宾\n东南亚全覆盖"),
+    ("🏛️", "合规体系", "目标区域合规牌照\n国际审计标准\n投资者权益保护"),
 ]
-for icon, title, desc, left in sources:
-    add_card(slide, left, Inches(1.8), Inches(3.6), Inches(1.8), f"{icon} {title}", desc)
+for i, (icon, title, desc) in enumerate(rwa_cards):
+    left = Inches(0.8 + i * 3.1)
+    add_card(slide, left, Inches(3.3), Inches(2.8), Inches(2.2), f"{icon} {title}", desc)
 
-# Exit mechanism
-add_text_box(slide, Inches(0.8), Inches(4.0), Inches(11.7), Inches(0.3),
-             "退出机制", font_size=20, color=GOLD, bold=True)
+# Stage note
+add_shape_bg(slide, Inches(0.8), Inches(5.8), Inches(11.7), Inches(0.6), RGBColor(0x30, 0x20, 0x20))
+add_text_box(slide, Inches(1.0), Inches(5.85), Inches(11.3), Inches(0.4),
+             "⚠ RWA为第二阶段战略规划，当前阶段聚焦平台建设与GPC平台通证生态发展",
+             font_size=14, color=ACCENT_RED, alignment=PP_ALIGN.CENTER)
 
-exits = [
-    "🔄 二级市场直接卖出 — T+0灵活退出",
-    "🛒 定期回购 — 资产方承诺回购机制（具体条件以协议为准）",
+
+# ═══════════════════════════════════════════════
+# SLIDE 11: ROADMAP
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+set_slide_bg(slide, DARK2)
+add_header_bar(slide, "发展路线图", "Roadmap", 11)
+
+phases = [
+    ("Phase 1", "Q2-Q3 2026", "平台搭建与上线",
+     [
+         "完成平台技术开发",
+         "GPC代币合约部署",
+         "获取合规资质",
+         "内部测试网运行",
+     ]),
+    ("Phase 2", "Q4 2026", "正式运营启动",
+     [
+         "主网上线与交易平台开放",
+         "GPC上线交易",
+         "Launchpad功能上线",
+         "全球社区建设启动",
+     ]),
+    ("Phase 3", "2027", "生态扩张",
+     [
+         "多区域拓展",
+         "更多交易对上线",
+         "用户规模增长",
+         "RWA试点项目启动",
+     ]),
+    ("Phase 4", "2028+", "RWA全面布局",
+     [
+         "RWA资产发行平台上线",
+         "多类型RWA资产开放",
+         "成为东南亚RWA标杆",
+         "建立行业标准",
+     ]),
 ]
-add_bullet_list(slide, Inches(0.8), Inches(4.4), Inches(11.7), Inches(1.0), exits, font_size=16)
+for i, (phase, time, title, items) in enumerate(phases):
+    left = Inches(0.5 + i * 3.2)
+    header = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(1.8), Inches(2.9), Inches(0.9))
+    header.fill.solid()
+    header.fill.fore_color.rgb = GOLD_DARK if i < 2 else RGBColor(0x2A, 0x3A, 0x50)
+    header.line.fill.background()
+    add_text_box(slide, left, Inches(1.85), Inches(2.9), Inches(0.3),
+                 f"{phase} | {time}", font_size=13, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left, Inches(2.2), Inches(2.9), Inches(0.3),
+                 title, font_size=12, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
+    add_bullet_list(slide, left + Inches(0.2), Inches(2.9), Inches(2.6), Inches(2.5),
+                    items, font_size=12, color=LIGHT_GRAY, bullet_char="•")
+    if i < len(phases) - 1:
+        add_text_box(slide, left + Inches(3.0), Inches(2.0), Inches(0.3), Inches(0.5),
+                     "→", font_size=20, color=GOLD, alignment=PP_ALIGN.CENTER)
 
-# Risk disclaimer
-add_shape_bg(slide, Inches(0.8), Inches(5.5), Inches(11.7), Inches(1.0), RGBColor(0x30, 0x20, 0x20))
-add_text_box(slide, Inches(1.0), Inches(5.6), Inches(11.3), Inches(0.3),
-             "⚠️ 风险提示", font_size=16, color=ACCENT_RED, bold=True)
-add_text_box(slide, Inches(1.0), Inches(5.95), Inches(11.3), Inches(0.4),
-             "市场波动风险 | 汇率风险 | 资产流动性风险 | 政策监管风险 | 投资有风险，决策需谨慎",
-             font_size=13, color=LIGHT_GRAY)
+
+# ═══════════════════════════════════════════════
+# SLIDE 12: COMPLIANCE & SECURITY
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+set_slide_bg(slide, DARK2)
+add_header_bar(slide, "合规与安全", "Compliance & Security", 12)
+
+# Compliance
+add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(2.0),
+         "合规体系",
+         "🛡️ 持牌运营目标\n🔍 严格KYC/AML体系\n📊 定期审计与透明度报告\n🌐 国际合规标准对标")
+
+# Security
+add_card(slide, Inches(6.8), Inches(1.8), Inches(5.5), Inches(2.0),
+         "安全保障",
+         "🔒 冷热钱包分离\n🤖 智能合约多重审计\n🕵️ 24/7风控监控\n✅ 多重签名管理")
+
+# Protection layers
+layers = [
+    ("第一层", "账户安全", "二次验证(2FA)\n反钓鱼保护\n登录监控"),
+    ("第二层", "交易安全", "风控引擎\n异常交易检测\n提现审核"),
+    ("第三层", "资产安全", "冷钱包离线存储\n多签钱包\n保险机制"),
+    ("第四层", "系统安全", "代码审计\n渗透测试\nDDoS防护"),
+]
+for i, (layer, title, desc) in enumerate(layers):
+    left = Inches(0.8 + i * 3.1)
+    add_card(slide, left, Inches(4.2), Inches(2.8), Inches(1.8), f"{layer}: {title}", desc)
 
 
 # ═══════════════════════════════════════════════
@@ -597,16 +595,15 @@ add_text_box(slide, Inches(1.0), Inches(5.95), Inches(11.3), Inches(0.4),
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "风控与资产安全", "Risk Control & Asset Security", 13)
+add_header_bar(slide, "风控体系", "Risk Control Framework", 13)
 
-# Risk layers
-layers = [
-    ("第一层", "底层资产尽调", "第三方专业评估机构\n实地尽调 + 独立估值", ACCENT_GREEN),
-    ("第二层", "法律合规审查", "知名律所出具\n法律意见书", ACCENT_BLUE),
-    ("第三层", "智能合约审计", "安全公司审计\n代码漏洞检测", GOLD),
-    ("第四层", "资产托管", "独立托管机构\n资产隔离保管", ACCENT_RED),
+risk_layers = [
+    ("第一层", "内部风控", "内控制度健全\n操作权限管理\n定期内部审计", ACCENT_GREEN),
+    ("第二层", "技术风控", "智能合约审计\n链上监控预警\n安全事件响应", ACCENT_BLUE),
+    ("第三层", "合规风控", "KYC/AML审核\n交易监控\n举报与处置", GOLD),
+    ("第四层", "外部风控", "第三方审计\n法律顾问\n保险保障", ACCENT_RED),
 ]
-for i, (layer, title, desc, color) in enumerate(layers):
+for i, (layer, title, desc, color) in enumerate(risk_layers):
     left = Inches(0.8 + i * 3.1)
     card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(1.8), Inches(2.8), Inches(2.3))
     card.fill.solid()
@@ -620,153 +617,95 @@ for i, (layer, title, desc, color) in enumerate(layers):
     add_text_box(slide, left + Inches(0.1), Inches(2.8), Inches(2.6), Inches(1.0),
                  desc, font_size=13, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Transparency
-add_card(slide, Inches(0.8), Inches(4.5), Inches(5.5), Inches(1.3),
-         "资产透明",
-         "🔍 链上资产数据实时可查\n📋 定期第三方审计报告公开\n📊 所有交易链上可追溯")
-
-# Insurance
-add_card(slide, Inches(6.8), Inches(4.5), Inches(5.5), Inches(1.3),
-         "保险机制",
-         "🛡️ 底层资产投保\n🔒 防范意外风险\n✅ 全方位安全保障")
-
-
-# ═══════════════════════════════════════════════
-# SLIDE 14: ROADMAP
-# ═══════════════════════════════════════════════
-slide = prs.slides.add_slide(prs.slide_layouts[6])
-set_slide_bg(slide, DARK2)
-add_header_bar(slide, "发展路线图", "Roadmap", 14)
-
-phases = [
-    ("Phase 1", "Q2-Q3 2026", "平台搭建 + 首个标的尽调",
-     [
-         "完成平台技术开发",
-         "芭提雅标的完成法律确权",
-         "获取合规资质",
-     ]),
-    ("Phase 2", "Q4 2026", "首个RWA发行 + 上线交易",
-     [
-         "芭提雅RWA正式发行",
-         "开放二级市场交易",
-         "启动全球社区建设",
-     ]),
-    ("Phase 3", "2027", "多资产上线 + 国际化",
-     [
-         "拓展至曼谷、普吉岛",
-         "引入商业地产等新RWA类型",
-         "申请更多地区合规牌照",
-     ]),
-    ("Phase 4", "2028+", "生态扩张",
-     [
-         "东南亚最大RWA发行交易平台",
-         "建立RWA行业标准",
-     ]),
+# Risk disclaimer
+add_shape_bg(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(1.5), RGBColor(0x22, 0x2E, 0x44))
+add_text_box(slide, Inches(1.0), Inches(4.6), Inches(11.3), Inches(0.3),
+             "📋 信息披露与透明度", font_size=16, color=GOLD, bold=True)
+transparency = [
+    "链上资产数据实时可查 — 所有GPC链上交易公开透明",
+    "定期第三方审计报告 — 平台资金与代币储备定期披露",
+    "用户资产独立托管 — 平台运营资金与用户资产严格分离",
 ]
-for i, (phase, time, title, items) in enumerate(phases):
-    left = Inches(0.5 + i * 3.2)
-    # Phase header
-    header = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(1.8), Inches(2.9), Inches(0.9))
-    header.fill.solid()
-    header.fill.fore_color.rgb = GOLD_DARK if i % 2 == 0 else RGBColor(0x2A, 0x3A, 0x50)
-    header.line.fill.background()
-    add_text_box(slide, left, Inches(1.85), Inches(2.9), Inches(0.3),
-                 f"{phase} | {time}", font_size=13, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
-    add_text_box(slide, left, Inches(2.2), Inches(2.9), Inches(0.3),
-                 title, font_size=12, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
-    # Items
-    add_bullet_list(slide, left + Inches(0.2), Inches(2.9), Inches(2.6), Inches(2.5),
-                    items, font_size=12, color=LIGHT_GRAY, bullet_char="•")
-    # Vertical connecting line
-    if i < len(phases) - 1:
-        add_text_box(slide, left + Inches(3.0), Inches(2.0), Inches(0.3), Inches(0.5),
-                     "→", font_size=20, color=GOLD, alignment=PP_ALIGN.CENTER)
+add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(11.3), Inches(0.9), transparency, font_size=14)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 15: CORE TEAM
+# SLIDE 14: CORE TEAM (TBD)
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "核心团队", "Core Team", 15)
+add_header_bar(slide, "核心团队", "Core Team", 14)
 
-# Team members
 team = [
-    ("👤", "CEO / 创始人", "待定\n行业背景丰富"),
-    ("👤", "CTO", "待定\n技术负责人"),
-    ("👤", "首席合规官", "待定\n法律/合规背景"),
-    ("👤", "首席运营官", "待定\n运营/市场经验"),
+    ("👤", "CEO / 创始人", "待定"),
+    ("👤", "CTO", "待定"),
+    ("👤", "首席合规官", "待定"),
+    ("👤", "首席运营官", "待定"),
 ]
 for i, (icon, title, desc) in enumerate(team):
     left = Inches(0.8 + i * 3.1)
-    add_card(slide, left, Inches(1.8), Inches(2.8), Inches(2.2), f"{icon} {title}", desc)
+    add_card(slide, left, Inches(1.8), Inches(2.8), Inches(2.0), f"{icon} {title}", desc)
 
-# Advisors
-add_card(slide, Inches(0.8), Inches(4.3), Inches(5.8), Inches(1.5),
-         "资产顾问",
-         "泰国房地产专家团队\n提供本地市场洞察与项目评估支持")
-
-add_card(slide, Inches(7.0), Inches(4.3), Inches(5.5), Inches(1.5),
+# Advisory board
+add_card(slide, Inches(0.8), Inches(4.2), Inches(5.5), Inches(1.5),
          "顾问团队（拟邀）",
-         "区块链 / 金融 / 法律领域\n知名专家与机构顾问")
+         "区块链 / 金融 / 法律领域知名专家与机构顾问\n具体名单待定")
+
+add_card(slide, Inches(6.8), Inches(4.2), Inches(5.5), Inches(1.5),
+         "技术合作伙伴（拟邀）",
+         "币安链生态合作伙伴\n区块链安全审计机构\n做市商与流动性合作伙伴")
+
+# Note
+add_shape_bg(slide, Inches(0.8), Inches(6.0), Inches(11.7), Inches(0.5), RGBColor(0x22, 0x2E, 0x44))
+add_text_box(slide, Inches(1.0), Inches(6.05), Inches(11.3), Inches(0.4),
+             "团队成员信息持续更新中，敬请期待",
+             font_size=14, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 16: CLOSING
+# SLIDE 15: CLOSING
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK)
 
-# Decorative top
 add_shape_bg(slide, Inches(0), Inches(0), Inches(13.333), Inches(3.0), RGBColor(0x12, 0x1A, 0x30))
-
-# Gold accent
 add_shape_bg(slide, Inches(0), Inches(3.0), Inches(13.333), Pt(5), GOLD)
 
-# Summary
 add_text_box(slide, Inches(1), Inches(1.0), Inches(11.3), Inches(0.5),
              "金孔雀交易所  |  GOLDEN PEACOCK EXCHANGE",
              font_size=22, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
 
 add_text_box(slide, Inches(1), Inches(1.6), Inches(11.3), Inches(0.6),
-             "核心信息回顾",
-             font_size=20, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
+             "核心信息回顾", font_size=20, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
 
 recap = [
-    "✅ 专注东南亚房地产RWA的合规资产发行与交易平台",
-    "✅ 首个标的：芭提雅核心区高端房产RWA",
-    "✅ 资产方：环球国际资产管理公司",
-    "✅ 投资门槛低，流动性强，合规透明",
+    "✅ 基于BNB Chain的数字资产交易平台",
+    "✅ 原生平台通证 GPC（总发行量100亿枚，BEP-20标准）",
+    "✅ 现货交易 · 质押挖矿 · Launchpad · 未来RWA",
+    "✅ 安全合规 · 透明可信 · 全球普惠",
 ]
 add_bullet_list(slide, Inches(2), Inches(2.1), Inches(9.3), Inches(1.0),
-                recap, font_size=14, color=LIGHT_GRAY)
+                recap, font_size=15, color=LIGHT_GRAY)
 
-# CTA
 add_text_box(slide, Inches(1), Inches(3.8), Inches(11.3), Inches(0.5),
-             "合作邀约",
-             font_size=24, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
-
+             "合作邀约", font_size=24, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1), Inches(4.4), Inches(11.3), Inches(0.8),
-             "欢迎机构投资者 · 资产方 · 合作伙伴 洽谈交流",
+             "欢迎机构投资者 · 做市商 · 技术伙伴 · 社区贡献者 洽谈合作",
              font_size=18, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Contact
 add_shape_bg(slide, Inches(3), Inches(5.3), Inches(7.333), Inches(1.0), RGBColor(0x22, 0x2E, 0x44))
 add_text_box(slide, Inches(3.5), Inches(5.4), Inches(6.333), Inches(0.3),
              "联系方式（待定）", font_size=15, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(3.5), Inches(5.75), Inches(6.333), Inches(0.4),
-             "官网 / 邮箱 / Telegram / 微信商务",
+             "官网 · 邮箱 · Telegram · 微信商务",
              font_size=14, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Tagline
 add_text_box(slide, Inches(1), Inches(6.5), Inches(11.3), Inches(0.6),
-             "「让世界资产自由流动」",
-             font_size=24, color=GOLD_LIGHT, bold=True, alignment=PP_ALIGN.CENTER)
+             "「链接数字资产 · 开启价值新纪元」",
+             font_size=22, color=GOLD_LIGHT, bold=True, alignment=PP_ALIGN.CENTER)
 
-# Bottom bar
 add_shape_bg(slide, Inches(0), Inches(7.1), Inches(13.333), Pt(4), GOLD)
-
-add_section_number(slide, 16)
+add_section_number(slide, 15, TOTAL_SLIDES)
 
 
 # ── SAVE ──
