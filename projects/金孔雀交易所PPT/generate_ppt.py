@@ -117,7 +117,7 @@ def add_bullet_list(slide, left, top, width, height, items, font_size=16, color=
     return tb
 
 
-def add_section_number(slide, num, total=15):
+def add_section_number(slide, num, total=16):
     add_text_box(slide, Inches(12.0), Inches(7.0), Inches(1.2), Inches(0.4),
                  f"{num}/{total}", font_size=11, color=GOLD_DARK, alignment=PP_ALIGN.RIGHT)
 
@@ -161,7 +161,7 @@ def add_table(slide, left, top, width, height, rows, cols, data, col_widths=None
     return table_shape
 
 
-TOTAL_SLIDES = 15
+TOTAL_SLIDES = 16
 
 # ═══════════════════════════════════════════════
 # SLIDE 1: COVER
@@ -412,7 +412,7 @@ add_header_bar(slide, "GPC代币价值与用途", "GPC Token Utility & Value Cap
 
 utilities = [
     ("💱", "手续费折扣", "持有GPC可享受\n平台交易手续费减免\n持有越多折扣越大"),
-    ("⛏️", "质押挖矿", "质押GPC获取\n平台收益分红\n灵活选择锁仓期限"),
+    ("💰", "合伙人分润", "质押GPC成为平台合伙人\n分享交易所手续费收益\n持有越多分润越高"),
     ("🗳️", "平台治理", "GPC持有者参与\n平台重大决策投票\n社区自治管理"),
     ("🚀", "Launchpad认购", "优质项目的优先\n认购权与额度分配\nGPC持有者专属"),
     ("🏪", "生态支付", "GPC作为平台内\n流通与支付介质\n交易对基础货币"),
@@ -478,11 +478,59 @@ for i, (time, who, detail) in enumerate(timeline_items):
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 10: FUTURE VISION - RWA
+# SLIDE 10: PARTNER REVENUE SHARING
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "未来战略 — RWA资产生态", "Future Vision: RWA Asset Ecosystem", 10)
+add_header_bar(slide, "合伙人收益计划", "Partner Revenue Sharing — Stake GPC, Share Exchange Fees", 10)
+
+# Core concept
+add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
+         "核心理念",
+         "持有并质押GPC，即可成为金孔雀交易所合伙人，每日分享平台交易手续费收益。质押越多，分润越高。")
+
+# Flow diagram - visual using cards
+flow_cards = [
+    ("💹", "交易所每笔交易", "产生手续费", Inches(0.8)),
+    ("→", "手续费收入池", "每日汇总结算", Inches(4.3)),
+    ("→", "按GPC质押比例", "分配至合伙人", Inches(6.8)),
+    ("💰", "合伙人钱包", "每日自动到账", Inches(9.3)),
+]
+for i, (icon, title, desc, left) in enumerate(flow_cards):
+    if i in [1, 2]:
+        add_text_box(slide, left - Inches(0.5), Inches(3.3), Inches(1.0), Inches(0.6),
+                     icon, font_size=28, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
+        add_card(slide, left, Inches(3.1), Inches(2.8), Inches(1.0), title, desc, bg_color=RGBColor(0x2A, 0x3A, 0x50))
+    else:
+        add_card(slide, left, Inches(3.1), Inches(3.2), Inches(1.0), f"{icon} {title}", desc)
+
+# Two tiers
+add_text_box(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(0.4),
+             "合伙人等级", font_size=20, color=GOLD, bold=True)
+
+tiers = [
+    ("🌟 创世合伙人", "• 创世节点持有者（1%配额）\n• 最高分润比例\n• 锁6月 · 12月线性释放\n• 平台早期治理权", True),
+    ("💎 GPC质押合伙人", "• 任何持有并质押GPC的用户\n• 按质押数量分配分润比例\n• 灵活质押，随时退出\n• 质押越多，分润越高", False),
+]
+for i, (title, body, is_genesis) in enumerate(tiers):
+    left = Inches(0.8 + i * 6.2)
+    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(5.0), Inches(5.8), Inches(2.0))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(0x1A, 0x2A, 0x3E)
+    card.line.color.rgb = GOLD if is_genesis else GOLD_DARK
+    card.line.width = Pt(2) if is_genesis else Pt(1)
+    add_text_box(slide, left + Inches(0.3), Inches(5.1), Inches(5.2), Inches(0.4),
+                 title, font_size=18, color=GOLD, bold=True)
+    add_text_box(slide, left + Inches(0.3), Inches(5.5), Inches(5.2), Inches(1.3),
+                 body, font_size=13, color=LIGHT_GRAY)
+
+
+# ═══════════════════════════════════════════════
+# SLIDE 11: FUTURE VISION - RWA
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+set_slide_bg(slide, DARK2)
+add_header_bar(slide, "未来战略 — RWA资产生态", "Future Vision: RWA Asset Ecosystem", 11)
 
 # Vision
 add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
@@ -512,7 +560,7 @@ add_text_box(slide, Inches(1.0), Inches(5.85), Inches(11.3), Inches(0.4),
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "发展路线图", "Roadmap", 11)
+add_header_bar(slide, "发展路线图", "Roadmap", 12)
 
 phases = [
     ("Phase 1", "Q2-Q3 2026", "平台搭建与上线",
@@ -566,7 +614,7 @@ for i, (phase, time, title, items) in enumerate(phases):
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "合规与安全", "Compliance & Security", 12)
+add_header_bar(slide, "合规与安全", "Compliance & Security", 13)
 
 # Compliance
 add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(2.0),
@@ -595,7 +643,7 @@ for i, (layer, title, desc) in enumerate(layers):
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "风控体系", "Risk Control Framework", 13)
+add_header_bar(slide, "风控体系", "Risk Control Framework", 14)
 
 risk_layers = [
     ("第一层", "内部风控", "内控制度健全\n操作权限管理\n定期内部审计", ACCENT_GREEN),
@@ -634,7 +682,7 @@ add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(11.3), Inches(0.9), tran
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "核心团队", "Core Team", 14)
+add_header_bar(slide, "核心团队", "Core Team", 15)
 
 team = [
     ("👤", "CEO / 创始人", "待定"),
@@ -663,7 +711,7 @@ add_text_box(slide, Inches(1.0), Inches(6.05), Inches(11.3), Inches(0.4),
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 15: CLOSING
+# SLIDE 16: CLOSING
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK)
@@ -705,7 +753,7 @@ add_text_box(slide, Inches(1), Inches(6.5), Inches(11.3), Inches(0.6),
              font_size=22, color=GOLD_LIGHT, bold=True, alignment=PP_ALIGN.CENTER)
 
 add_shape_bg(slide, Inches(0), Inches(7.1), Inches(13.333), Pt(4), GOLD)
-add_section_number(slide, 15, TOTAL_SLIDES)
+add_section_number(slide, 16, TOTAL_SLIDES)
 
 
 # ── SAVE ──
