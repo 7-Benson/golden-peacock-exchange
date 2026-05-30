@@ -1,0 +1,6 @@
+.openclaw/
+.learnings/
+HEARTBEAT.md
+TASK_QUEUE.md
+parse_xlsx.js
+memory/
