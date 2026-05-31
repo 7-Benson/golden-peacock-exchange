@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Golden Peacock Exchange PPT - Platform Token + Exchange Narrative"""
+"""Generate Golden Peacock Exchange PPT - Multi-Asset Compliance Platform"""
 
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
@@ -52,30 +52,6 @@ def add_text_box(slide, left, top, width, height, text, font_size=18, color=WHIT
     p.font.bold = bold
     p.font.name = font_name
     p.alignment = alignment
-    return txBox
-
-
-def add_rich_text_box(slide, left, top, width, height, lines, font_name='Microsoft YaHei'):
-    txBox = slide.shapes.add_textbox(left, top, width, height)
-    tf = txBox.text_frame
-    tf.word_wrap = True
-    for i, line_data in enumerate(lines):
-        text = line_data[0]
-        font_size = line_data[1] if len(line_data) > 1 else 18
-        color = line_data[2] if len(line_data) > 2 else WHITE
-        bold = line_data[3] if len(line_data) > 3 else False
-        alignment = line_data[4] if len(line_data) > 4 else PP_ALIGN.LEFT
-        if i == 0:
-            p = tf.paragraphs[0]
-        else:
-            p = tf.add_paragraph()
-        p.text = text
-        p.font.size = Pt(font_size)
-        p.font.color.rgb = color
-        p.font.bold = bold
-        p.font.name = font_name
-        p.alignment = alignment
-        p.space_after = Pt(6)
     return txBox
 
 
@@ -135,7 +111,6 @@ def add_header_bar(slide, title, subtitle=None, page_num=None):
 
 
 def add_table(slide, left, top, width, height, rows, cols, data, col_widths=None):
-    """Add a table. data = list of lists."""
     table_shape = slide.shapes.add_table(rows, cols, left, top, width, height)
     table = table_shape.table
     if col_widths:
@@ -151,7 +126,6 @@ def add_table(slide, left, top, width, height, rows, cols, data, col_widths=None
                 paragraph.font.color.rgb = WHITE if r == 0 else LIGHT_GRAY
                 if r == 0:
                     paragraph.font.bold = True
-                # Header row background
                 if r == 0:
                     cell.fill.solid()
                     cell.fill.fore_color.rgb = GOLD_DARK
@@ -194,9 +168,9 @@ add_text_box(slide, Inches(1), Inches(4.5), Inches(11.3), Inches(0.8),
 add_shape_bg(slide, Inches(5), Inches(5.3), Inches(3.333), Pt(3), GOLD)
 
 add_text_box(slide, Inches(1), Inches(5.6), Inches(11.3), Inches(0.6),
-             "数字资产交易平台  —  GPC平台通证首发", font_size=20, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
+             "综合性合规资产交易平台  —  GPC平台通证首发", font_size=20, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1), Inches(6.3), Inches(11.3), Inches(0.5),
-             "链接数字资产 · 开启价值新纪元", font_size=16, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
+             "链接多元价值 · 开启资产新纪元", font_size=16, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
 
 add_shape_bg(slide, Inches(0), Inches(7.1), Inches(13.333), Pt(4), GOLD)
 add_section_number(slide, 1, TOTAL_SLIDES)
@@ -212,14 +186,14 @@ add_header_bar(slide, "项目概览", "Project Overview", 2)
 # Positioning
 add_shape_bg(slide, Inches(0.8), Inches(1.7), Inches(11.7), Inches(0.8), RGBColor(0x22, 0x2E, 0x44))
 add_text_box(slide, Inches(1.0), Inches(1.8), Inches(11.3), Inches(0.6),
-             "新一代数字资产交易平台 — 基于币安链（BNB Chain）构建，原生平台通证GPC驱动生态",
+             "多种合规复合型资产的综合性交易平台 — 基于币安链（BNB Chain）构建，原生平台通证GPC驱动生态",
              font_size=18, color=GOLD_LIGHT, bold=True)
 
 # Three key cards
 cards_data = [
-    ("🏛️", "平台定位", "数字资产交易平台\n支持现货交易、质押挖矿\nLaunchpad等核心功能"),
-    ("💎", "平台通证 GPC", "总发行量 10,000,000,000\nBEP-20标准\n驱动平台生态价值"),
-    ("🔮", "未来展望", "东南亚领先的数字资产交易生态\nRWA不动产代币化（规划中）"),
+    ("🏛️", "平台定位", "综合性合规资产交易平台\n支持股票证券/数字资产\n质押/Launchpad/RWA"),
+    ("💎", "平台通证 GPC", "总发行量 1,000,000,000\nBEP-20标准\n驱动平台生态价值"),
+    ("🔮", "战略布局", "多元合规资产交易\n股票证券+RWA+\n数字资产三位一体"),
 ]
 for i, (icon, title, body) in enumerate(cards_data):
     left = Inches(0.8 + i * 4.1)
@@ -229,7 +203,7 @@ for i, (icon, title, body) in enumerate(cards_data):
 add_text_box(slide, Inches(0.8), Inches(5.2), Inches(11.7), Inches(0.4),
              "项目愿景", font_size=20, color=GOLD, bold=True)
 add_text_box(slide, Inches(0.8), Inches(5.7), Inches(11.7), Inches(0.6),
-             "构建安全、高效、透明的数字资产交易生态，让全球用户自由参与数字资产价值流通",
+             "构建安全、合规、透明的多元化资产交易生态，让全球用户自由参与多种合规资产的价值流通",
              font_size=17, color=LIGHT_GRAY)
 
 
@@ -241,12 +215,12 @@ set_slide_bg(slide, DARK2)
 add_header_bar(slide, "市场机遇", "Market Opportunity", 3)
 
 cards3 = [
-    ("📊", "全球加密市场爆发",
-     "• 全球加密用户超5亿\n• 数字资产交易量持续增长\n• 合规化趋势加速\n• 机构资金大举入场"),
-    ("🌏", "东南亚数字浪潮",
-     "• 东南亚加密采用率全球领先\n• 年轻人口+高移动渗透率\n• 传统金融覆盖不足\n→ 数字金融弯道超车"),
-    ("🏆", "交易所竞争格局",
-     "• 区域化交易所崛起\n• BNB Chain生态快速增长\n• 合规+本地化 = 核心壁垒\n• GPC平台币驱动生态飞轮"),
+    ("📊", "合规资产数字化浪潮",
+     "• 传统股票证券数字化交易规模持续增长\n• 机构资金加速入场\n• 全球合规化趋势明显\n• 多元化资产配置需求旺盛"),
+    ("🌏", "东南亚多元金融浪潮",
+     "• 东南亚加密采用率全球领先\n• 年轻人口+高移动渗透率\n• 多元化合规资产需求爆发\n→ 数字金融弯道超车"),
+    ("🏆", "平台竞争壁垒",
+     "• 合规+多元化资产+本地化 = 核心壁垒\n• 单一资产交易平台已不满足需求\n• GPC平台币驱动生态飞轮\n• 股票证券+数字资产+RWA三位一体"),
 ]
 for i, (icon, title, body) in enumerate(cards3):
     left = Inches(0.8 + i * 4.1)
@@ -257,7 +231,7 @@ add_shape_bg(slide, Inches(0.8), Inches(5.0), Inches(11.7), Inches(1.0), RGBColo
 add_text_box(slide, Inches(1.0), Inches(5.05), Inches(11.3), Inches(0.3),
              "🌟 战略前瞻", font_size=16, color=GOLD, bold=True)
 add_text_box(slide, Inches(1.0), Inches(5.4), Inches(11.3), Inches(0.5),
-             "RWA（真实世界资产代币化）市场预计2030年达数万亿级别 — 金孔雀交易所将以此作为第二阶段核心战略",
+             "RWA（真实世界资产代币化）市场预计2030年达数万亿级别 — 金孔雀交易所将此作为核心战略方向之一",
              font_size=14, color=LIGHT_GRAY)
 
 
@@ -272,7 +246,7 @@ props = [
     ("🛡️", "安全可靠", "多层安全防护体系\n冷热钱包分离\n第三方安全审计"),
     ("⚡", "高效流畅", "基于BNB Chain\n高吞吐低延迟\n毫秒级交易确认"),
     ("🔍", "透明可信", "链上资产可查\n定期审计报告\n合规KYC/AML"),
-    ("🌐", "全球普惠", "低门槛参与\n多语言支持\n多元化金融服务"),
+    ("🌐", "多元合规", "覆盖股票证券\n数字资产、RWA\n多资产类别合规交易"),
 ]
 for i, (icon, title, desc) in enumerate(props):
     left = Inches(0.8 + i * 3.1)
@@ -300,19 +274,20 @@ set_slide_bg(slide, DARK2)
 add_header_bar(slide, "平台核心功能", "Core Platform Features", 5)
 
 feats = [
-    ("💱", "现货交易", "主流交易对支持\n订单簿深度好\n专业级交易界面"),
-    ("⛏️", "GPC质押挖矿", "质押GPC获取收益\n灵活质押期限\n年化收益可观"),
+    ("💹", "股票/证券交易", "合规股票证券交易通道\n多元化投资选择\n主流市场接入"),
+    ("⛏️", "GPC质押挖矿", "质押GPC获取收益\n灵活质押期限\n按月手续费结算"),
     ("🚀", "Launchpad", "优质项目首发平台\nGPC持有者优先认购\n代币销售与拍卖"),
-    ("🔗", "RWA资产发行", "第二阶段开放\n实体资产代币化\n合规发行交易平台"),
+    ("🔗", "RWA资产发行", "现实资产代币化\n合规发行交易\n多类型资产支持"),
 ]
 for i, (icon, title, desc) in enumerate(feats):
     left = Inches(0.8 + i * 3.1)
     add_card(slide, left, Inches(1.8), Inches(2.8), Inches(2.3), f"{icon} {title}", desc)
 
-# Additional features
+# More features
 add_text_box(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(0.4),
              "更多功能", font_size=18, color=GOLD, bold=True)
 more_feats = [
+    "数字资产现货交易 — 主流交易对，订单簿深度，专业级交易界面",
     "钱包服务 — 安全资产管理，多链支持",
     "行情数据 — 实时K线、深度图、市场分析",
     "API接口 — 面向量化交易与机构客户",
@@ -336,9 +311,9 @@ add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.5),
 # Core modules
 modules = [
     ("💱", "交易引擎", "高性能撮合引擎\n订单簿深度管理\n实时行情推送"),
-    ("⛓️", "智能合约", "质押挖矿合约\nLaunchpad合约\n未来：RWA发行标准"),
+    ("⛓️", "智能合约", "质押挖矿合约\nLaunchpad合约\nRWA发行标准"),
     ("🛡️", "安全系统", "KYC/AML认证系统\n风控引擎\n冷热钱包分离"),
-    ("💳", "钱包服务", "多链钱包支持\nGPC资产管理\n充值提现系统"),
+    ("💳", "资产管理系统", "多链钱包支持\n证券资产托管\n充值提现系统"),
 ]
 for i, (icon, title, desc) in enumerate(modules):
     left = Inches(0.8 + i * 3.1)
@@ -359,18 +334,18 @@ add_header_bar(slide, "GPC代币经济模型", "GPC Tokenomics", 7)
 # Token info
 add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(1.0),
          "代币信息",
-         "代币符号：GPC  |  总发行量：10,000,000,000  |  标准：BEP-20  |  公链：BNB Chain")
+         "代币符号：GPC  |  总发行量：1,000,000,000  |  标准：BEP-20  |  公链：BNB Chain")
 
 # Allocation table
 table_data = [
     ["用途", "比例", "数量", "锁仓规则"],
-    ["🌱 生态与社区激励", "60%", "60亿", "按智能合约逐步释放"],
-    ["🏦 生态基金/战略储备", "15%", "15亿", "基金会多签管理"],
-    ["💧 流动性储备", "10%", "10亿", "上线即部分流通"],
-    ["👥 团队与创始人", "2%", "2亿", "锁12个月，分24月线性释放"],
-    ["🌟 创世节点", "1%", "1亿", "锁6个月，分12月线性释放"],
-    ["📢 市场推广", "5%", "5亿", "按活动计划释放"],
-    ["🏛️ 基金会储备", "7%", "7亿", "多签钱包管理"],
+    ["🌱 生态与社区激励", "60%", "6亿", "按智能合约逐步释放"],
+    ["🏦 生态基金/战略储备", "15%", "1.5亿", "基金会多签管理"],
+    ["💧 流动性储备", "10%", "1亿", "上线即部分流通"],
+    ["👥 团队与创始人", "2%", "2000万", "锁36个月，分36月线性释放"],
+    ["🌟 创世节点", "1%", "1000万", "锁36个月"],
+    ["📢 市场推广", "5%", "5000万", "按活动计划释放"],
+    ["🏛️ 基金会储备", "7%", "7000万", "多签钱包管理"],
 ]
 
 add_table(slide, Inches(0.8), Inches(3.1), Inches(7.5), Inches(3.2),
@@ -383,7 +358,7 @@ add_text_box(slide, Inches(9.2), Inches(1.9), Inches(3.4), Inches(0.4),
              "📊 关键数据", font_size=18, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
 key_data = [
     "总发行量",
-    "10,000,000,000",
+    "1,000,000,000",
     "GPC",
     "",
     "公链",
@@ -412,11 +387,11 @@ add_header_bar(slide, "GPC代币价值与用途", "GPC Token Utility & Value Cap
 
 utilities = [
     ("💱", "手续费折扣", "持有GPC可享受\n平台交易手续费减免\n持有越多折扣越大"),
-    ("💰", "合伙人分润", "质押GPC成为平台合伙人\n分享交易所手续费收益\n持有越多分润越高"),
+    ("💰", "合伙人分润", "质押GPC成为平台合伙人\n按月分享交易所手续费\n持有越多分润越高"),
     ("🗳️", "平台治理", "GPC持有者参与\n平台重大决策投票\n社区自治管理"),
     ("🚀", "Launchpad认购", "优质项目的优先\n认购权与额度分配\nGPC持有者专属"),
     ("🏪", "生态支付", "GPC作为平台内\n流通与支付介质\n交易对基础货币"),
-    ("📈", "价值增值", "平台生态增长驱动\nGPC需求持续上升\n通缩机制持续赋能"),
+    ("📈", "价值增值", "多元化资产生态增长驱动\nGPC需求持续上升\n通缩机制持续赋能"),
 ]
 for i, (icon, title, desc) in enumerate(utilities):
     row = i // 3
@@ -435,8 +410,8 @@ add_header_bar(slide, "代币释放计划", "Token Release Schedule", 9)
 
 # Schedule cards
 schedules = [
-    ("👥 团队与创始人", "2%", "锁仓12个月", "第13-36个月线性释放\n每月释放约0.083%"),
-    ("🌟 创世节点", "1%", "锁仓6个月", "第7-18个月线性释放\n每月释放约0.083%"),
+    ("👥 团队与创始人", "2%", "锁仓36个月", "第1-36个月线性释放\n每月释放约0.056%"),
+    ("🌟 创世节点", "1%", "锁仓36个月", "第1-36个月分批释放\n持有人锁仓周期36个月"),
     ("🌱 生态与社区激励", "60%", "按智能合约逐步释放", "交易挖矿/质押奖励/\n社区空投分期释放"),
     ("其他", "37%", "分批释放", "流动性/基金/市场/\n储备按计划管理"),
 ]
@@ -463,12 +438,11 @@ add_text_box(slide, Inches(0.8), Inches(4.9), Inches(11.7), Inches(0.3),
 
 timeline_items = [
     ("T+0", "流动性储备\n市场推广部分", "上线即部分流通"),
-    ("T+6月", "创世节点解锁\n开始线性释放", "7-18月逐步解锁"),
-    ("T+12月", "团队解锁\n开始线性释放", "13-36月逐步解锁"),
     ("T+持续", "生态激励\n逐步释放", "按智能合约规则"),
+    ("T+36月", "创世节点/团队\n开始分批释放", "36个月逐步解锁"),
 ]
 for i, (time, who, detail) in enumerate(timeline_items):
-    left = Inches(0.8 + i * 3.1)
+    left = Inches(0.8 + i * 3.1 + 0.7)
     add_text_box(slide, left, Inches(5.3), Inches(2.8), Inches(0.3),
                  f"📌 {time}", font_size=14, color=ACCENT_GREEN, bold=True, alignment=PP_ALIGN.CENTER)
     add_text_box(slide, left, Inches(5.6), Inches(2.8), Inches(0.3),
@@ -482,19 +456,19 @@ for i, (time, who, detail) in enumerate(timeline_items):
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "合伙人收益计划", "Partner Revenue Sharing — Stake GPC, Share Exchange Fees", 10)
+add_header_bar(slide, "合伙人收益计划", "Partner Revenue Sharing", 10)
 
 # Core concept
 add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
          "核心理念",
-         "持有并质押GPC，即可成为金孔雀交易所合伙人，每日分享平台交易手续费收益。质押越多，分润越高。")
+         "持有并质押GPC，即可成为金孔雀交易所合伙人，按月分享平台全部交易手续费收益。质押越多，分润越高。")
 
 # Flow diagram - visual using cards
 flow_cards = [
     ("💹", "交易所每笔交易", "产生手续费", Inches(0.8)),
-    ("→", "手续费收入池", "每日汇总结算", Inches(4.3)),
+    ("→", "手续费收入池", "月终汇总结算", Inches(4.3)),
     ("→", "按GPC质押比例", "分配至合伙人", Inches(6.8)),
-    ("💰", "合伙人钱包", "每日自动到账", Inches(9.3)),
+    ("💰", "合伙人钱包", "按月自动到账", Inches(9.3)),
 ]
 for i, (icon, title, desc, left) in enumerate(flow_cards):
     if i in [1, 2]:
@@ -504,13 +478,22 @@ for i, (icon, title, desc, left) in enumerate(flow_cards):
     else:
         add_card(slide, left, Inches(3.1), Inches(3.2), Inches(1.0), f"{icon} {title}", desc)
 
-# Two tiers
-add_text_box(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(0.4),
-             "合伙人等级", font_size=20, color=GOLD, bold=True)
+# Key rules
+add_shape_bg(slide, Inches(0.8), Inches(4.5), Inches(5.5), Inches(1.8), RGBColor(0x1A, 0x2A, 0x3E))
+add_text_box(slide, Inches(1.0), Inches(4.6), Inches(5.1), Inches(0.3),
+             "🔑 核心规则", font_size=16, color=GOLD, bold=True)
+rules = [
+    "合伙人锁仓周期：36个月",
+    "手续费结算方式：按月结算",
+    "分润比例按质押GPC数量分配",
+    "每月自动到账，无需手动领取",
+]
+add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(5.1), Inches(1.2), rules, font_size=13)
 
+# Two tiers
 tiers = [
-    ("🌟 创世合伙人", "• 创世节点持有者（1%配额）\n• 最高分润比例\n• 锁6月 · 12月线性释放\n• 平台早期治理权", True),
-    ("💎 GPC质押合伙人", "• 任何持有并质押GPC的用户\n• 按质押数量分配分润比例\n• 灵活质押，随时退出\n• 质押越多，分润越高", False),
+    ("🌟 创世合伙人", "• 创世节点持有者（1%配额）\n• 最高分润比例\n• 锁仓36个月\n• 平台早期治理权", True),
+    ("💎 GPC质押合伙人", "• 任何持有并质押GPC的用户\n• 按质押数量分配分润比例\n• 质押越多，分润越高\n• 灵活的参与机制", False),
 ]
 for i, (title, body, is_genesis) in enumerate(tiers):
     left = Inches(0.8 + i * 6.2)
@@ -526,37 +509,44 @@ for i, (title, body, is_genesis) in enumerate(tiers):
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 11: FUTURE VISION - RWA
+# SLIDE 11: MULTI-ASSET LAYOUT
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
-add_header_bar(slide, "未来战略 — RWA资产生态", "Future Vision: RWA Asset Ecosystem", 11)
+add_header_bar(slide, "多元资产战略布局", "Multi-Asset Strategy", 11)
 
-# Vision
-add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
+# Strategic vision
+add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.0),
          "战略定位",
-         "金孔雀交易所以数字资产交易平台为起点，长远目标是成为东南亚领先的RWA（真实世界资产）发行与交易平台")
+         "金孔雀交易所定位为综合性合规资产交易平台，实现三大资产类别的有机融合 — 一个平台，多种合规资产选择")
 
-# RWA vision content
-rwa_cards = [
-    ("🏠", "房地产RWA", "泰国芭提雅\高端房地产项目\n（规划中）"),
-    ("📦", "多资产扩展", "商业地产/基建\n消费金融/供应链\n等多类型RWA"),
-    ("🌏", "区域拓展", "曼谷/普吉岛\n越南/印尼/菲律宾\n东南亚全覆盖"),
-    ("🏛️", "合规体系", "目标区域合规牌照\n国际审计标准\n投资者权益保护"),
+# Three asset cards
+asset_cards = [
+    ("💹", "股票证券资产", "合规通道接入\n主流市场股票/ETF/证券交易\n多元化投资选择\n遵循各国证券法规"),
+    ("⚡", "数字资产", "主流加密货币现货交易\nBNB Chain生态集成\n安全快捷的数字资产管理\n合规KYC/AML体系"),
+    ("🏠", "RWA现实资产", "房地产等实体资产代币化\n合规发行与交易平台\n多类型RWA资产支持\n东南亚区域优先布局"),
 ]
-for i, (icon, title, desc) in enumerate(rwa_cards):
-    left = Inches(0.8 + i * 3.1)
-    add_card(slide, left, Inches(3.3), Inches(2.8), Inches(2.2), f"{icon} {title}", desc)
+for i, (icon, title, desc) in enumerate(asset_cards):
+    left = Inches(0.8 + i * 4.1)
+    card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, Inches(3.1), Inches(3.7), Inches(2.5))
+    card.fill.solid()
+    card.fill.fore_color.rgb = RGBColor(0x1A, 0x2A, 0x3E)
+    card.line.color.rgb = GOLD
+    card.line.width = Pt(1)
+    add_text_box(slide, left, Inches(3.2), Inches(3.7), Inches(0.5),
+                 f"{icon} {title}", font_size=18, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, left + Inches(0.2), Inches(3.8), Inches(3.3), Inches(1.5),
+                 desc, font_size=14, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Stage note
-add_shape_bg(slide, Inches(0.8), Inches(5.8), Inches(11.7), Inches(0.6), RGBColor(0x30, 0x20, 0x20))
-add_text_box(slide, Inches(1.0), Inches(5.85), Inches(11.3), Inches(0.4),
-             "⚠ RWA为第二阶段战略规划，当前阶段聚焦平台建设与GPC平台通证生态发展",
-             font_size=14, color=ACCENT_RED, alignment=PP_ALIGN.CENTER)
+# Disclaimer
+add_shape_bg(slide, Inches(0.8), Inches(5.9), Inches(11.7), Inches(0.6), RGBColor(0x30, 0x20, 0x20))
+add_text_box(slide, Inches(1.0), Inches(5.95), Inches(11.3), Inches(0.4),
+             "⚖ 所有资产类别均严格遵循合规框架，持合法牌照运营，用户资产安全第一",
+             font_size=14, color=GOLD_LIGHT, alignment=PP_ALIGN.CENTER)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 11: ROADMAP
+# SLIDE 12: ROADMAP
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
@@ -580,16 +570,16 @@ phases = [
     ("Phase 3", "2027", "生态扩张",
      [
          "多区域拓展",
-         "更多交易对上线",
-         "用户规模增长",
-         "RWA试点项目启动",
+         "股票证券交易通道上线",
+         "RWA资产试点启动",
+         "用户规模快速增长",
      ]),
-    ("Phase 4", "2028+", "RWA全面布局",
+    ("Phase 4", "2028+", "多元资产全面布局",
      [
-         "RWA资产发行平台上线",
-         "多类型RWA资产开放",
-         "成为东南亚RWA标杆",
-         "建立行业标准",
+         "多类型RWA资产全面开放",
+         "全面合规证券交易体系",
+         "成为东南亚多元资产交易标杆",
+         "建立行业合规标准",
      ]),
 ]
 for i, (phase, time, title, items) in enumerate(phases):
@@ -610,7 +600,7 @@ for i, (phase, time, title, items) in enumerate(phases):
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 12: COMPLIANCE & SECURITY
+# SLIDE 13: COMPLIANCE & SECURITY
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
@@ -619,7 +609,7 @@ add_header_bar(slide, "合规与安全", "Compliance & Security", 13)
 # Compliance
 add_card(slide, Inches(0.8), Inches(1.8), Inches(5.5), Inches(2.0),
          "合规体系",
-         "🛡️ 持牌运营目标\n🔍 严格KYC/AML体系\n📊 定期审计与透明度报告\n🌐 国际合规标准对标")
+         "🛡️ 持牌运营目标\n🔍 严格KYC/AML体系\n📊 证券交易合规牌照\n🌐 国际合规标准对标")
 
 # Security
 add_card(slide, Inches(6.8), Inches(1.8), Inches(5.5), Inches(2.0),
@@ -639,7 +629,7 @@ for i, (layer, title, desc) in enumerate(layers):
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 13: RISK CONTROL
+# SLIDE 14: RISK CONTROL
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
@@ -665,7 +655,7 @@ for i, (layer, title, desc, color) in enumerate(risk_layers):
     add_text_box(slide, left + Inches(0.1), Inches(2.8), Inches(2.6), Inches(1.0),
                  desc, font_size=13, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
-# Risk disclaimer
+# Risk disclosure
 add_shape_bg(slide, Inches(0.8), Inches(4.5), Inches(11.7), Inches(1.5), RGBColor(0x22, 0x2E, 0x44))
 add_text_box(slide, Inches(1.0), Inches(4.6), Inches(11.3), Inches(0.3),
              "📋 信息披露与透明度", font_size=16, color=GOLD, bold=True)
@@ -673,12 +663,13 @@ transparency = [
     "链上资产数据实时可查 — 所有GPC链上交易公开透明",
     "定期第三方审计报告 — 平台资金与代币储备定期披露",
     "用户资产独立托管 — 平台运营资金与用户资产严格分离",
+    "多元资产专属风控 — 股票/数字资产/RWA分别设立独立风控模型",
 ]
-add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(11.3), Inches(0.9), transparency, font_size=14)
+add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(11.3), Inches(1.0), transparency, font_size=14)
 
 
 # ═══════════════════════════════════════════════
-# SLIDE 14: CORE TEAM (TBD)
+# SLIDE 15: CORE TEAM (TBD)
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_slide_bg(slide, DARK2)
@@ -727,10 +718,10 @@ add_text_box(slide, Inches(1), Inches(1.6), Inches(11.3), Inches(0.6),
              "核心信息回顾", font_size=20, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
 
 recap = [
-    "✅ 基于BNB Chain的数字资产交易平台",
-    "✅ 原生平台通证 GPC（总发行量100亿枚，BEP-20标准）",
-    "✅ 现货交易 · 质押挖矿 · Launchpad · 未来RWA",
-    "✅ 安全合规 · 透明可信 · 全球普惠",
+    "✅ 基于BNB Chain的综合性合规资产交易平台",
+    "✅ 原生平台通证 GPC（总发行量10亿枚，BEP-20标准）",
+    "✅ 股票证券 · 数字资产 · RWA 三类合规资产一体化交易",
+    "✅ 安全合规 · 透明可信 · 多元资产 · 全球普惠",
 ]
 add_bullet_list(slide, Inches(2), Inches(2.1), Inches(9.3), Inches(1.0),
                 recap, font_size=15, color=LIGHT_GRAY)
@@ -749,7 +740,7 @@ add_text_box(slide, Inches(3.5), Inches(5.75), Inches(6.333), Inches(0.4),
              font_size=14, color=LIGHT_GRAY, alignment=PP_ALIGN.CENTER)
 
 add_text_box(slide, Inches(1), Inches(6.5), Inches(11.3), Inches(0.6),
-             "「链接数字资产 · 开启价值新纪元」",
+             "「链接多元价值 · 开启资产新纪元」",
              font_size=22, color=GOLD_LIGHT, bold=True, alignment=PP_ALIGN.CENTER)
 
 add_shape_bg(slide, Inches(0), Inches(7.1), Inches(13.333), Pt(4), GOLD)
