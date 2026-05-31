@@ -461,7 +461,7 @@ add_header_bar(slide, "合伙人收益计划", "Partner Revenue Sharing", 10)
 # Core concept
 add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
          "核心理念",
-         "持有并质押GPC，即可成为金孔雀交易所合伙人，享有双重收益：全网提币手续费70%分红 + 5代下级交易手续费返佣。")
+         "创世节点持有者需质押GPC获得收益；任何质押GPC的用户均可成为平台合伙人，直接享有双重收益：全网提币手续费70%分红 + 5代交易手续费奖励。")
 
 # Flow diagram - visual using cards
 flow_cards = [
@@ -481,19 +481,19 @@ for i, (icon, title, desc, left) in enumerate(flow_cards):
 # Two revenue streams
 add_shape_bg(slide, Inches(0.8), Inches(4.5), Inches(5.5), Inches(1.8), RGBColor(0x1A, 0x2A, 0x3E))
 add_text_box(slide, Inches(1.0), Inches(4.6), Inches(5.1), Inches(0.3),
-             "💰 双重收益体系", font_size=16, color=GOLD, bold=True)
+             "💰 双重收益体系（全体平台合伙人享有）", font_size=15, color=GOLD, bold=True)
 streams = [
     "收益一：全网提币手续费的70%按GPC质押比例分配",
-    "收益二：5代以内下级用户交易手续费返佣",
-    "合伙人锁仓周期：36个月",
-    "手续费结算方式：按月结算，自动到账",
+    "收益二：5代以内下级用户交易手续费奖励",
+    "创世节点与合伙人均锁仓36个月",
+    "按月结算，自动到账",
 ]
 add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(5.1), Inches(1.2), streams, font_size=13)
 
 # Two tiers
 tiers = [
-    ("🌟 创世合伙人", "• 创世节点持有者（1%配额）\n• 最高分润比例\n• 享70%提币费+5代返佣\n• 锁仓36个月\n• 平台早期治理权", True),
-    ("💎 GPC质押合伙人", "• 任何持有并质押GPC的用户\n• 按质押数量分配\n• 享70%提币费+5代返佣\n• 质押越多，分润越高\n• 锁仓36个月", False),
+    ("🌟 创世节点", "• 持有创世节点配额的用户\n• 需质押GPC才能获得收益\n• 享70%提币费+5代返佣\n• 锁仓36个月\n• 最高分润比例", True),
+    ("💎 平台合伙人", "• 任何质押GPC的用户均可成为\n• 按质押数量分配收益\n• 享70%提币费+5代返佣\n• 质押越多，分润越高\n• 锁仓36个月", False),
 ]
 for i, (title, body, is_genesis) in enumerate(tiers):
     left = Inches(0.8 + i * 6.2)
