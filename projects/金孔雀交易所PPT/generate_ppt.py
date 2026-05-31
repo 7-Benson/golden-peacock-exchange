@@ -461,14 +461,14 @@ add_header_bar(slide, "合伙人收益计划", "Partner Revenue Sharing", 10)
 # Core concept
 add_card(slide, Inches(0.8), Inches(1.8), Inches(11.7), Inches(1.2),
          "核心理念",
-         "持有并质押GPC，即可成为金孔雀交易所合伙人，按月分享平台全部交易手续费收益。质押越多，分润越高。")
+         "持有并质押GPC，即可成为金孔雀交易所合伙人，享有双重收益：全网提币手续费70%分红 + 5代下级交易手续费返佣。")
 
 # Flow diagram - visual using cards
 flow_cards = [
-    ("💹", "交易所每笔交易", "产生手续费", Inches(0.8)),
-    ("→", "手续费收入池", "月终汇总结算", Inches(4.3)),
-    ("→", "按GPC质押比例", "分配至合伙人", Inches(6.8)),
-    ("💰", "合伙人钱包", "按月自动到账", Inches(9.3)),
+    ("💹", "交易所产生手续费", "提币手续费+交易手续费", Inches(0.8)),
+    ("→", "双重收益分配", "70%提币费+5代返佣", Inches(4.3)),
+    ("→", "月结汇总", "按质押比例+层级分配", Inches(6.8)),
+    ("💰", "合伙人钱包", "每月自动到账", Inches(9.3)),
 ]
 for i, (icon, title, desc, left) in enumerate(flow_cards):
     if i in [1, 2]:
@@ -478,22 +478,22 @@ for i, (icon, title, desc, left) in enumerate(flow_cards):
     else:
         add_card(slide, left, Inches(3.1), Inches(3.2), Inches(1.0), f"{icon} {title}", desc)
 
-# Key rules
+# Two revenue streams
 add_shape_bg(slide, Inches(0.8), Inches(4.5), Inches(5.5), Inches(1.8), RGBColor(0x1A, 0x2A, 0x3E))
 add_text_box(slide, Inches(1.0), Inches(4.6), Inches(5.1), Inches(0.3),
-             "🔑 核心规则", font_size=16, color=GOLD, bold=True)
-rules = [
+             "💰 双重收益体系", font_size=16, color=GOLD, bold=True)
+streams = [
+    "收益一：全网提币手续费的70%按GPC质押比例分配",
+    "收益二：5代以内下级用户交易手续费返佣",
     "合伙人锁仓周期：36个月",
-    "手续费结算方式：按月结算",
-    "分润比例按质押GPC数量分配",
-    "每月自动到账，无需手动领取",
+    "手续费结算方式：按月结算，自动到账",
 ]
-add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(5.1), Inches(1.2), rules, font_size=13)
+add_bullet_list(slide, Inches(1.0), Inches(5.0), Inches(5.1), Inches(1.2), streams, font_size=13)
 
 # Two tiers
 tiers = [
-    ("🌟 创世合伙人", "• 创世节点持有者（1%配额）\n• 最高分润比例\n• 锁仓36个月\n• 平台早期治理权", True),
-    ("💎 GPC质押合伙人", "• 任何持有并质押GPC的用户\n• 按质押数量分配分润比例\n• 质押越多，分润越高\n• 灵活的参与机制", False),
+    ("🌟 创世合伙人", "• 创世节点持有者（1%配额）\n• 最高分润比例\n• 享70%提币费+5代返佣\n• 锁仓36个月\n• 平台早期治理权", True),
+    ("💎 GPC质押合伙人", "• 任何持有并质押GPC的用户\n• 按质押数量分配\n• 享70%提币费+5代返佣\n• 质押越多，分润越高\n• 锁仓36个月", False),
 ]
 for i, (title, body, is_genesis) in enumerate(tiers):
     left = Inches(0.8 + i * 6.2)
